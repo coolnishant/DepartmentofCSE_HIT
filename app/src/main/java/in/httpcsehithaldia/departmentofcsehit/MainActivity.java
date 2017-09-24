@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             webView.goBack();
             back = 3;
         } else {
-            if(back == 1) {
+            if(back != 1) {
                 back--;
                 Toast.makeText(this,"Press Back Again To EXIT.",Toast.LENGTH_SHORT).show();
             }
