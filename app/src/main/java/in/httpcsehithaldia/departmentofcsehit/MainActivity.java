@@ -16,11 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
    /*  Creatd by Abhijeet on 08.08.2017 */
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private int back = 3;
     private static final String URL = "http://csehithaldia.in/";
 
     @Override
@@ -37,8 +39,14 @@ public class MainActivity extends AppCompatActivity {
         if (webView.canGoBack())
         {
             webView.goBack();
+            back = 3;
         } else {
-            super.onBackPressed();
+            if(back == 1) {
+                back--;
+                Toast.makeText(this,"Press Back Again To EXIT.",Toast.LENGTH_SHORT).show();
+            }
+            else
+                super.onBackPressed();
         }
     }
 
