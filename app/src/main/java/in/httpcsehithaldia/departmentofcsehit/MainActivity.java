@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack())
+        if (webView.canGoBack() && isNetworkAvailable())
         {
             webView.goBack();
             back = 3;
@@ -58,17 +58,14 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-            String reason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
-            boolean isFailover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
 
             NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-            NetworkInfo otherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
 
             if(currentNetworkInfo.isConnected()){
                 loadPage(URL);
             }else {
                 loadPage("file:///android_asset/noconnection.html");
+                Toast.makeText(getApplication(),"Please Connect To INTERNET!",Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -95,5 +92,11 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.loadingPan).setVisibility(View.GONE);
             }
         });
+    }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
