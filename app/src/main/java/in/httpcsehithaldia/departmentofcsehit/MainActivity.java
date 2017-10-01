@@ -1,14 +1,30 @@
 package in.httpcsehithaldia.departmentofcsehit;
+import android.Manifest;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.os.Bundle;
@@ -18,21 +34,29 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-   /*  Creatd by Abhijeet on 08.08.2017 */
+   /*  Created by Abhijeet on 08.08.2017 */
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private int back = 3;
+    private static Animation hyperspaceJump;
     private static final String URL = "http://csehithaldia.in/";
+    private static final int REQUEST_CODE_ASK_PERMISSIONS = 59;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        if (checkPermission())
+//        {
+        webView = (WebView) findViewById(R.id.webView);
+        hyperspaceJump = AnimationUtils.loadAnimation(MainActivity.this, R.anim.animation_zoom_out);
 
-        webView = (WebView)findViewById(R.id.webView);
-        this.registerReceiver(this.mConnReceiver,
-                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        this.registerReceiver(this.mConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+//        }
+//        else{
+//            onCreate(savedInstanceState);
+//        }
     }
     @Override
     public void onBackPressed() {
@@ -60,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-
             if(currentNetworkInfo.isConnected()){
                 loadPage(URL);
             }else {
@@ -73,6 +96,29 @@ public class MainActivity extends AppCompatActivity {
     private void loadPage(String url){
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(url);
+        webView.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+                request.setMimeType(mimetype);
+                //------------------------COOKIE!!------------------------
+                String cookies = CookieManager.getInstance().getCookie(url);
+                request.addRequestHeader("cookie", cookies);
+                //------------------------COOKIE!!------------------------
+                request.addRequestHeader("User-Agent", userAgent);
+                request.setDescription("Downloading file...");
+                request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype));
+                request.allowScanningByMediaScanner();
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype));
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                dm.enqueue(request);
+                Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
+
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -90,13 +136,16 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 findViewById(R.id.loadingPan).setVisibility(View.GONE);
+                webView.startAnimation(hyperspaceJump);
             }
         });
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
 }
