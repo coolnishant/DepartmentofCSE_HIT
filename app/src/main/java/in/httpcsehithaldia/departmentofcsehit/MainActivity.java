@@ -1,36 +1,28 @@
 package in.httpcsehithaldia.departmentofcsehit;
-import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.webkit.WebSettings;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -120,7 +112,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient(){
+
+            public void onProgressChanged(WebView view, int newProgress) {
+
+            }
+//
+//            @Override
+//            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+//                return super.onJsAlert(view, "", message, result);
+//            }
+//
+//            @Override
+//            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+//                return super.onJsConfirm(view, url, message, result);
+//            }
+//
+//            @Override
+//            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+//                return super.onJsPrompt(view, url, message, defaultValue, result);
+//            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -138,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.loadingPan).setVisibility(View.GONE);
                 webView.startAnimation(hyperspaceJump);
             }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                webView.loadUrl("file:///android_asset/myerror.html");
+            }
+
         });
     }
 
