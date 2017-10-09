@@ -16,18 +16,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.JsPromptResult;
-import android.webkit.JsResult;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
    /*  Created by Abhijeet on 08.08.2017 */
+    /* Edited by Nishant on 29.09.2017*/
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -150,11 +146,11 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.loadingPan).setVisibility(View.GONE);
                 webView.startAnimation(hyperspaceJump);
             }
-
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                webView.loadUrl("file:///android_asset/myerror.html");
-            }
+//
+//            @Override
+//            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+//                webView.loadUrl("file:///android_asset/myerror.html");
+//            }
 
         });
     }
