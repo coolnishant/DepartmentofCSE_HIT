@@ -28,6 +28,8 @@ public class SplashMain extends AppCompatActivity {
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 59;
     private static Animation hyperspaceJump;
     private TextView tvCSEDEPT;
+    private TextView tvDev;
+    private net.bohush.geometricprogressview.GeometricProgressView myPV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,8 @@ public class SplashMain extends AppCompatActivity {
 
         hyperspaceJump = AnimationUtils.loadAnimation(this, R.anim.animation_zoom_out);
         tvCSEDEPT.startAnimation(hyperspaceJump);
+        //tvDev.startAnimation(hyperspaceJump);
+        //myPV.startAnimation(hyperspaceJump);
         if(checkPermission())
             SPLASH_TIME_OUT = 2000;
         callHandlerToMainActivity();
@@ -44,9 +48,11 @@ public class SplashMain extends AppCompatActivity {
 
     private void intiallize() {
         tvCSEDEPT = (TextView) findViewById(R.id.textView);
+        tvDev = (TextView) findViewById(R.id.tvnamedev);
+        myPV = (net.bohush.geometricprogressview.GeometricProgressView) findViewById(R.id.myprogressView);
     }
 
-    public boolean checkPermission()
+    private boolean checkPermission()
     {
         int currentAPIVersion = Build.VERSION.SDK_INT;
         if(currentAPIVersion>=android.os.Build.VERSION_CODES.M)
