@@ -12,8 +12,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -25,7 +28,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
+
 
    /*  Created by Abhijeet on 08.08.2017 */
     /* Edited by Nishant on 01.10.2017*/
@@ -33,9 +38,10 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private int back = 3;
-    private static Animation hyperspaceJump;
+    private static Animation hyperspaceJump,roatateanim;
     private static final String URL = "http://csehithaldia.in/";
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 59;
+    private TextView tvpercent;
 
     private ValueCallback<Uri> mUploadMessage;
     public ValueCallback<Uri[]> uploadMessage;
@@ -46,16 +52,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabrefresh);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Reloading....", Toast.LENGTH_LONG).show();
+                loadPage(URL);
+            }
+        });
+
 //        if (checkPermission())
 //        {
         webView = (WebView) findViewById(R.id.webView);
+        tvpercent = (TextView) findViewById(R.id.tVpercent);
         hyperspaceJump = AnimationUtils.loadAnimation(MainActivity.this, R.anim.animation_zoom_out);
+        roatateanim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.animationshake);
 
         this.registerReceiver(this.mConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 //        }
 //        else{
 //            onCreate(savedInstanceState);
 //        }
+
     }
     @Override
     public void onBackPressed() {
@@ -87,12 +106,15 @@ public class MainActivity extends AppCompatActivity {
                 loadPage(URL);
             }else {
                 loadPage("file:///android_asset/noconnection.html");
+                findViewById(R.id.fabrefresh).setVisibility(View.GONE);
                 Toast.makeText(getApplication(),"Please Connect To INTERNET!",Toast.LENGTH_SHORT).show();
             }
         }
     };
 
     private void loadPage(String url){
+        webView.setVisibility(View.GONE);
+        findViewById(R.id.loadingPan).setVisibility(View.VISIBLE);
         WebSettings mWebSettings = webView.getSettings();
         mWebSettings.setJavaScriptEnabled(true);
         mWebSettings.setSupportZoom(false);
@@ -126,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient(){
 
             public void onProgressChanged(WebView view, int newProgress) {
-
+                    tvpercent.setText(newProgress+"%");
             }
 
             // For 3.0+ Devices (Start)
@@ -211,12 +233,15 @@ public class MainActivity extends AppCompatActivity {
                 super.onPageStarted(view, url, favicon);
                 webView.setVisibility(View.GONE);
                 findViewById(R.id.loadingPan).setVisibility(View.VISIBLE);
+                findViewById(R.id.fabrefresh).setVisibility(View.GONE);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 findViewById(R.id.loadingPan).setVisibility(View.GONE);
+                if(!url.contains("noconnection"))
+                    findViewById(R.id.fabrefresh).setVisibility(View.VISIBLE);
                 webView.startAnimation(hyperspaceJump);
                 webView.setVisibility(View.VISIBLE);
             }
@@ -262,5 +287,4 @@ public class MainActivity extends AppCompatActivity {
         else
             Toast.makeText(this.getApplicationContext(), "Failed to Upload Image", Toast.LENGTH_LONG).show();
     }
-
 }
